@@ -1,22 +1,47 @@
 #!/bin/bash
-# Auto script to stop Talisman Online servers
 
-# Set base directory (adjust this to your server root if needed)
-BASE_DIR=/root
+# Base directory (set this to your server root folder)
+BASE_DIR="$HOME/"
 
-# Stop db_server
-pkill -f "./db_server"
-sleep 1
-rm -f $BASE_DIR/game/game_server.pid
+# Start DB server in first tab
+konsole --new-tab -e bash -c "
+cd \"$BASE_DIR/db\" || exit
+if [ -f db_server.pid ]; then
+    rm -f db_server.pid
+    echo 'Removed old db_server.pid'
+fi
+sleep 2
+./db_server
+exec bash
+" &
 
-# Stop login_server
-pkill -f "./login_server"
-sleep 1
-rm -f $BASE_DIR/login/login_server.pid
+# Wait before starting login server
+sleep 5
 
-# Stop game_server
-pkill -f "./game_server"
-sleep 1
-rm -f $BASE_DIR/db/db_server.pid
+# Start Login server in second tab
+konsole --new-tab -e bash -c "
+cd \"$BASE_DIR/login\" || exit
+if [ -f login_server.pid ]; then
+    rm -f login_server.pid
+    echo 'Removed old login_server.pid'
+fi
+sleep 2
+./login_server
+exec bash
+" &
 
-echo "✅ All servers stopped and PID files removed (db_server, login_server, game_server)."
+
+# Wait before starting login server
+sleep 10
+
+# Start Login server in second tab
+konsole --new-tab -e bash -c "
+cd \"$BASE_DIR/game\" || exit
+if [ -f game_server.pid ]; then
+    rm -f game_server.pid
+    echo 'Removed old game_server.pid'
+fi
+sleep 2
+./game_server
+exec bash
+" &
