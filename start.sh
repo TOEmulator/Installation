@@ -32,7 +32,7 @@ exec bash;
 
 
 # Wait before starting game server
-sleep 10
+sleep 20
 
 # Start Game server in a new terminal
 lxterminal --title="Game Server" -e bash -c "
